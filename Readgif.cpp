@@ -16,6 +16,7 @@
 // GIF Loader
 // by Paul Bartrum
 // Modified by M.Brent
+// This code is believed to be free.
 
 #include <windows.h>
 #include <stdio.h>
