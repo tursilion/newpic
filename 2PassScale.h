@@ -4,8 +4,9 @@
 // Modified by M.Brent for 3-byte RGB values instead of 4-byte COLORREFs
 
 #include <math.h> 
-
 #include "Filters.h" 
+
+extern void* mymalloc(int bytecount);
 
 typedef struct 
 { 
@@ -96,16 +97,16 @@ LineContribType *
 C2PassScale<FilterClass>::
 AllocContributions (UINT uLineLength, UINT uWindowSize)
 {
-    LineContribType *res = new LineContribType; 
+    LineContribType *res = (LineContribType*)mymalloc(sizeof(LineContribType)); 
         // Init structure header 
     res->WindowSize = uWindowSize; 
     res->LineLength = uLineLength; 
         // Allocate list of contributions 
-    res->ContribRow = new ContributionType[uLineLength];
+    res->ContribRow = (ContributionType*)mymalloc(sizeof(ContributionType) * uLineLength);
     for (UINT u = 0 ; u < uLineLength ; u++) 
     {
         // Allocate contributions for every pixel
-        res->ContribRow[u].Weights = new double[uWindowSize];
+        res->ContribRow[u].Weights = (double*)mymalloc(sizeof(double)*uWindowSize);
     }
     return res; 
 } 
@@ -118,10 +119,10 @@ FreeContributions (LineContribType * p)
     for (UINT u = 0; u < p->LineLength; u++) 
     {
         // Free contribs for every pixel
-        delete [] p->ContribRow[u].Weights;
+        free(p->ContribRow[u].Weights);
     }
-    delete [] p->ContribRow;    // Free list of pixels contribs
-    delete p;                   // Free contribs header
+    free(p->ContribRow);    // Free list of pixels contribs
+    free(p);                // Free contribs header
 } 
  
 template <class FilterClass>
@@ -363,7 +364,7 @@ AllocAndScale (
 { 
     // Scale source image horizontally into temporary image
     m_bCanceled = FALSE;
-    unsigned char *pTemp = (unsigned char*)malloc(uNewWidth * uOrigHeight * 3);
+    unsigned char *pTemp = (unsigned char*)mymalloc(uNewWidth * uOrigHeight * 3);
     HorizScale (pOrigImage, 
                 uOrigWidth,
                 uOrigHeight,
@@ -376,7 +377,7 @@ AllocAndScale (
         return NULL;
     }
     // Scale temporary image vertically into result image    
-    unsigned char *pRes = (unsigned char*)malloc(uNewWidth * uNewHeight * 3);
+    unsigned char *pRes = (unsigned char*)mymalloc(uNewWidth * uNewHeight * 3);
     VertScale ( pTemp,
                 uNewWidth,
                 uOrigHeight,
@@ -406,7 +407,7 @@ Scale (
 { 
     // Scale source image horizontally into temporary image
     m_bCanceled = FALSE;
-    unsigned char *pTemp = (unsigned char*)malloc(uNewWidth * uOrigHeight * 3);
+    unsigned char *pTemp = (unsigned char*)mymalloc(uNewWidth * uOrigHeight * 3);
     HorizScale (pOrigImage, 
                 uOrigWidth,
                 uOrigHeight,

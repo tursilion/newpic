@@ -129,6 +129,17 @@ void ProcessMonitors();
 void ProcessHQuads();
 void ProcessVQuads();
 
+// MY malloc is better than YOUR malloc
+// allocate in fixed chunks to hopefully reduce fragmentation in server mode
+#define MEGABYTE (1024*1024)
+void* mymalloc(int bytecount) {
+    // round everything up to 1MB, if it's bigger than 512k (Windows cutoff for different allocator) (supposedly)
+    if (bytecount >= 512*1024) {
+        bytecount = (bytecount+MEGABYTE-1)/MEGABYTE*MEGABYTE;
+    }
+    return malloc(bytecount);
+}
+
 // exit batchfile helper
 void check(int code) {
 	if ((code>0)&&(fStopOnErr)) {
@@ -354,7 +365,7 @@ int EnumerateRectangles(int inMinX, int inMinY) {
 	int x,y, tx, ty, th, bx, by, idx, big;
 
 	if (NULL == FillBuffer) {
-		FillBuffer=(BYTE*)malloc(iWidth*(iHeight+1));	// 8-bit buffer just to mark used areas
+		FillBuffer=(BYTE*)mymalloc(iWidth*(iHeight+1));	// 8-bit buffer just to mark used areas
 		ZeroMemory(FillBuffer, iWidth*(iHeight+1));
 		currentx=0;
 		currenty=0;
@@ -1200,6 +1211,10 @@ int wmain(int argc, wchar_t *argv[])
 #ifdef _DEBUG
 			while (!_kbhit());
 #endif
+            if (NULL != hBuffer2) {
+    	        free(hBuffer2);
+                hBuffer2=NULL;
+            }
 			check(exitcode);
 		}
 
@@ -1215,7 +1230,10 @@ int wmain(int argc, wchar_t *argv[])
 		IS40_CloseSource(hDest);
 	}
 
-	delete hBuffer2;
+    if (NULL != hBuffer2) {
+    	free(hBuffer2);
+        hBuffer2=NULL;
+    }
 
 	if ('\0' != szFillBuffName[0]) {
 		// write fill buffer to a file too
@@ -2031,7 +2049,7 @@ bool ScalePic(wchar_t *szFile)
 
 	if ((finalW==inWidth) && (finalH==inHeight)) {
 		// just copy to the temp buffer
-		tmpBuffer=new BYTE[finalW*finalH*3];
+        tmpBuffer = (HGLOBAL)mymalloc(finalW*finalH*3);
 		memcpy(tmpBuffer, hBuffer, finalW*finalH*3);
 	} else {
 		// do the scale
@@ -2041,7 +2059,7 @@ bool ScalePic(wchar_t *szFile)
 	}
 
 	if (NULL == hBuffer2) {
-		hBuffer2=new BYTE[iWidth * (iHeight+1) * 3];
+        hBuffer2 = (HGLOBAL)mymalloc(iWidth * (iHeight+1) * 3);
 		ZeroMemory(hBuffer2, iWidth * (iHeight+1) * 3);
 	}
 
@@ -2153,7 +2171,10 @@ bool ScalePic(wchar_t *szFile)
 		}
 	}
 
-	delete tmpBuffer;
+    if (NULL != tmpBuffer) {
+        free(tmpBuffer);
+        tmpBuffer = NULL;
+    }
 
 	// before writing the map, see if we got mandatory offset information
 	if ((bNeedVpag)&&(!bGotVpag)) {
@@ -2362,7 +2383,7 @@ void ProcessMonitors() {
 	wprintf(L"\nDetected %d monitors, with overall size of %d x %d\n\n", NumMonitors, MasterWidth, MasterHeight);
 
 	// create a master buffer - this will eventually become hBuffer2 before we return
-	BYTE *hMasterBuf = new BYTE[MasterWidth*(MasterHeight+1)*3];
+	BYTE *hMasterBuf = (BYTE*)mymalloc(MasterWidth*(MasterHeight+1)*3);
 	ZeroMemory(hMasterBuf, MasterWidth*(MasterHeight+1)*3);
 
 	// Prior to Windows 10 (not sure about 8!), a tiled image at 0,0 started at the primary monitor,
@@ -2439,7 +2460,7 @@ void ProcessMonitors() {
 			}
 
 			// destroy the old hBuffer2, and repeat
-			delete[] hBuffer2;
+            free(hBuffer2);
 			hBuffer2=NULL;
 		} else {
 			wprintf(L"Warning! No images at all for monitor %d\n", idx);
@@ -2484,12 +2505,12 @@ void ProcessHQuads() {
 
 	// Create the output buffer here
 	if (NULL == hBuffer2) {
-		hBuffer2=new BYTE[iWidth * (iHeight+1) * 3];
+		hBuffer2=(HGLOBAL)mymalloc(iWidth * (iHeight+1) * 3);
 		ZeroMemory(hBuffer2, iWidth * iHeight * 3);
 	}
 	// And the fill buffer
 	if (NULL == FillBuffer) {
-		FillBuffer=(BYTE*)malloc(iWidth*iHeight);	// 8-bit buffer just to mark used areas
+		FillBuffer=(BYTE*)mymalloc(iWidth*iHeight);	// 8-bit buffer just to mark used areas
 		ZeroMemory(FillBuffer, iWidth*iHeight);
 	}
 
@@ -2628,12 +2649,12 @@ void ProcessVQuads() {
 
 	// Create the output buffer here
 	if (NULL == hBuffer2) {
-		hBuffer2=new BYTE[iWidth * (iHeight+1) * 3];
+		hBuffer2=(HGLOBAL)mymalloc(iWidth * (iHeight+1) * 3);
 		ZeroMemory(hBuffer2, iWidth * (iHeight+1) * 3);
 	}
 	// And the fill buffer
 	if (NULL == FillBuffer) {
-		FillBuffer=(BYTE*)malloc(iWidth*iHeight);	// 8-bit buffer just to mark used areas
+		FillBuffer=(BYTE*)mymalloc(iWidth*iHeight);	// 8-bit buffer just to mark used areas
 		ZeroMemory(FillBuffer, iWidth*iHeight);
 	}
 

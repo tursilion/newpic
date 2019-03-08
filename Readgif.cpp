@@ -344,7 +344,7 @@ HGLOBAL load_gif(wchar_t *filename, unsigned int *iWidth, unsigned int *iHeight)
 					else if(code < empty_string)
 					{
 						get_string(code);
-						output_string();
+						output_string(); 
 
 						if(bit_overflow == 0) {
 							str[empty_string].base = (short)old;
