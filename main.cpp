@@ -1042,7 +1042,7 @@ int wmain(int argc, wchar_t *argv[])
 		wprintf(L"If no parameters are specified, will size to primary monitor size, in the\n");
 		wprintf(L"NewPic folder, save it as backdrop.bmp, and set the windows backdrop.\n");
 		wprintf(L"Unicode filenames now supported.\n");
-		wprintf(L"path=[path to pictures]\n");
+		wprintf(L"path=[path to pictures] (may be repeated for more paths)\n");
 		wprintf(L"map=[path to mosaic map [file|x|y|w|h|origw|origh|offx|offy]]\n");
 		wprintf(L"outwidth=[output width]\n");
 		wprintf(L"outheight=[output height]\n");
@@ -1093,7 +1093,7 @@ int wmain(int argc, wchar_t *argv[])
 		wprintf(L"returnfailed [errorlevel return is number of mosaic files failed or skipped]\n");
 		wprintf(L"server [process multiple files with sync events to external app]\n");
 		wprintf(L"monitors [size image to monitors and align with monitor offsets]\n");
-		wprintf(L"\n\nBy Mike Brent (Tursi). http://harmlesslion.com v117 - 17 October 2018\n");
+		wprintf(L"\n\nBy Mike Brent (Tursi). http://harmlesslion.com v118 - 25 January 2020\n");
 #ifdef _DEBUG
 			while (!_kbhit());
 #endif

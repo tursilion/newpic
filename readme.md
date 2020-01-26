@@ -13,6 +13,7 @@ NEWPIC <optional argument=value pairs>
 
 path=<path to pictures>
  Specify the path which will be recursively scanned for image files. Default is the working folder.
+ This argument may be repeated to scan multiple paths.
 
 map=<path to map file>
  Mainly intended for mosaics - will output a map of the mosaic with one line per image. If the input 
@@ -241,9 +242,8 @@ are refreshed.)
 page via the mosaic function.
 
 Sometimes the program can not load an image, due to the wide variety of weird headers. The program 
-will automatically try again, up to five times (or maxerr) before giving up. The program has a 
-maximum of 100000 input files. 
+will automatically try again (with the next file), up to five times (or maxerr) before giving up. The 
+program has a maximum of 500000 input files. 
 
 Active Desktop component refresh only works with 8.3 filenames (at least under Win98, likely works 
 better under 2k and XP).
-

@@ -166,7 +166,7 @@
     <ClInclude Include="Filters.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="readme.txt" />
+    <None Include="readme.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
