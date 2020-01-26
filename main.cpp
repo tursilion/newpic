@@ -40,7 +40,7 @@
 #include "D:\WORK\imgsource\4.0\islibs40_vs17_unicode\ISource.h"
 #include "2passscale.h"
 
-#define MAXFILES 200000
+#define MAXFILES 500000
 
 wchar_t szFiles[MAXFILES][256];
 BYTE *pTmp;
@@ -700,7 +700,7 @@ int wmain(int argc, wchar_t *argv[])
 	// get arguments
 	for (iCnt=1; iCnt<argc; iCnt++) {
 		if (!_wcsnicmp(argv[iCnt], L"path=", 5)) {
-			wcscpy(szFolder, &argv[iCnt][5]);
+            // defer this to after...
 			continue;
 		}
 
@@ -1107,7 +1107,31 @@ int wmain(int argc, wchar_t *argv[])
 	// Enable this line for a list of skipped files in the root
 	//	fpSkip=_wfopen(L"D:\\skiplist.txt", L"w");
 
-	BuildFileList(szFolder);
+    // BuildFileList will append all found files, as its meant to
+    // be called recursively anyway. So we can just call it in a loop
+    // in order to support multiple source folders
+    // note that afterwards, szFolder will contain the last listed one!
+    {
+        bool pathSpecified = false;
+        for (int idx=1; idx<argc; idx++) {
+		    if (!_wcsnicmp(argv[idx], L"path=", 5)) {
+                pathSpecified = true;
+			    wcscpy(szFolder, &argv[idx][5]);
+                if (wcslen(szFolder) > 0) {
+                    wprintf(L"Scanning %s...\n", szFolder);
+            	    BuildFileList(szFolder);
+                }
+			    continue;
+		    }
+        }
+        if (!pathSpecified) {
+            // legacy behaviour, call with the default path
+            if (wcslen(szFolder) > 0) {
+                wprintf(L"Scanning %s...\n", szFolder);
+                BuildFileList(szFolder);
+            }
+        }
+    }
 
 	if (NULL != fpSkip) {
 		fclose(fpSkip);	
@@ -1888,6 +1912,7 @@ void BuildFileList(wchar_t *szFolder)
 			(0==_wcsicmp(&buffer[wcslen(buffer)-3], L"jpg")) ||
 			//(0==_wcsicmp(&buffer[wcslen(buffer)-3], L"jpc")) ||
 			(0==_wcsicmp(&buffer[wcslen(buffer)-4], L"jpeg")) ||
+			(0==_wcsicmp(&buffer[wcslen(buffer)-4], L"jfif")) ||
 			(0==_wcsicmp(&buffer[wcslen(buffer)-3], L"png")) ||
 			(0==_wcsicmp(&buffer[wcslen(buffer)-3], L"pcx")) ||
 			(0==_wcsicmp(&buffer[wcslen(buffer)-3], L"psd")) ||
