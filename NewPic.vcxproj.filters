@@ -19,14 +19,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="2PassScale.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Filters.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
+    <None Include="readme.txt" />
     <None Include="readme.md" />
   </ItemGroup>
 </Project>

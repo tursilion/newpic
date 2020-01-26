@@ -162,11 +162,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="2PassScale.h" />
-    <ClInclude Include="Filters.h" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="readme.md" />
+    <None Include="readme.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

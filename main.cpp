@@ -38,7 +38,6 @@
 // modified the library to work strictly in unicode, I didn't
 // use the partial unicode support the author built in.
 #include "D:\WORK\imgsource\4.0\islibs40_vs17_unicode\ISource.h"
-#include "2passscale.h"
 
 #define MAXFILES 500000
 
@@ -1093,7 +1092,7 @@ int wmain(int argc, wchar_t *argv[])
 		wprintf(L"returnfailed [errorlevel return is number of mosaic files failed or skipped]\n");
 		wprintf(L"server [process multiple files with sync events to external app]\n");
 		wprintf(L"monitors [size image to monitors and align with monitor offsets]\n");
-		wprintf(L"\n\nBy Mike Brent (Tursi). http://harmlesslion.com v118 - 25 January 2020\n");
+		wprintf(L"\n\nBy Mike Brent (Tursi). http://harmlesslion.com v119 - 25 January 2020\n");
 #ifdef _DEBUG
 			while (!_kbhit());
 #endif
@@ -2077,10 +2076,31 @@ bool ScalePic(wchar_t *szFile)
         tmpBuffer = (HGLOBAL)mymalloc(finalW*finalH*3);
 		memcpy(tmpBuffer, hBuffer, finalW*finalH*3);
 	} else {
-		// do the scale
-		// now do the nice smoothing filtered scale
-		C2PassScale <CBilinearFilter> ScaleEngine;
-		tmpBuffer=ScaleEngine.AllocAndScale((BYTE*)hBuffer, inWidth, inHeight, finalW, finalH);
+		// do the scale - just use ImgSource - it has really nice scaling!
+        // the modes are:
+        //Mode     Name                 Notes
+        //0        box filter 
+        //1        triangle filter
+        //2        Hamming filter
+        //3        Gaussian filter      min dimension : 2
+        //4        bell filter          min dimension : 2
+        //5        B-spline filter      min dimension : 2
+        //6        cubic 1 filter       min dimension : 2
+        //7        cubic 2 filter       min dimension : 2
+        //8        Lanczos3 filter      min dimension : 3
+        //9        Mitchell filter      min dimension : 2
+        //10       sinc filter          min dimension : 4
+        //11       Hermite filter
+        //12       Hanning filter
+        //13       Catrom filter        min dimension : 2
+        //14       area-average (fast)  Reduction only
+        //15       area-average         Reduction only
+        //16       bi-linear interpolation
+        //17       bi-cubic interpolation
+        //18       nearest neighbor     very fast
+        const int mode = 5;
+        tmpBuffer = (HGLOBAL)mymalloc(finalW * finalH * 3);
+        IS40_ResizeImage((BYTE*)hBuffer, inWidth, inHeight, inWidth*3, (BYTE*)tmpBuffer, finalW, finalH, finalW*3, 3, mode, 0);
 	}
 
 	if (NULL == hBuffer2) {
