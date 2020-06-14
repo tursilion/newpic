@@ -1396,7 +1396,7 @@ recount:
 		cntdown=iCnt;
 		while ((szFiles[n][0]=='\0') || (szFiles[n][0] & 0x80)) {
 			n++;
-			if (n>=iCnt) n=0;
+            if (n>=iCnt) n=0;
 			cntdown--;
 			if (cntdown == 0) {
 				if (fServer) {
@@ -1804,7 +1804,9 @@ recount:
 		}
 		if (0 == EnumerateRectangles(minmosaicx, minmosaicy)) {
 			// there's no room left!
-            --n;    // in case we're continuing in a new area, don't skip this image
+            // undo this file so we can use it in the next area
+            szFiles[n][0] &= 0x7f;
+            --n;
 			break;
 		}
 
