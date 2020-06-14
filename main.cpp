@@ -1804,6 +1804,7 @@ recount:
 		}
 		if (0 == EnumerateRectangles(minmosaicx, minmosaicy)) {
 			// there's no room left!
+            --n;    // in case we're continuing in a new area, don't skip this image
 			break;
 		}
 
