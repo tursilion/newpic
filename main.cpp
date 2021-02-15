@@ -39,9 +39,12 @@
 // use the partial unicode support the author built in.
 #include "D:\WORK\imgsource\4.0\islibs40_vs17_unicode\ISource.h"
 
+// my maximum file count
 #define MAXFILES 500000
+// my maximum file path size
+#define MY_MAX_PATH 1024
 
-wchar_t szFiles[MAXFILES][256];
+wchar_t szFiles[MAXFILES][MY_MAX_PATH];
 BYTE *pTmp;
 int iCnt, n, ret, errCount;
 int nSkip;
@@ -52,10 +55,10 @@ int AddFilename;
 int ScaleMode;
 int Background;
 unsigned int iMinWidth, iMinHeight;
-wchar_t szFolder[256];
-wchar_t szOutfile[256];
-wchar_t szBuf[256];
-wchar_t szFillBuffName[256];
+wchar_t szFolder[MY_MAX_PATH];
+wchar_t szOutfile[MY_MAX_PATH];
+wchar_t szBuf[MY_MAX_PATH];
+wchar_t szFillBuffName[MY_MAX_PATH];
 wchar_t *hquads=NULL;
 wchar_t *vquads=NULL;
 unsigned int iWidth, iHeight;
@@ -117,7 +120,7 @@ int nPerFileDelay=0;
 extern HGLOBAL load_gif(wchar_t *filename, unsigned int *iWidth, unsigned int *iHeight);
 // for the map file, we read this data from the png. ImageMagick adds the oFFs and vpAg chunks
 int mapOrigW, mapOrigH, mapOffW, mapOffH;
-wchar_t szMap[256];
+wchar_t szMap[MY_MAX_PATH];
 
 int instr(wchar_t *, wchar_t*);
 bool ScalePic(wchar_t *szFilename);
@@ -229,7 +232,7 @@ int fncomp(const void *p1, const void *p2) {
 }
 void SortListByName(int nCnt) {
 	wprintf(L"Sorting file list...\n");
-	qsort(szFiles, nCnt, 256, fncomp);
+	qsort(szFiles, nCnt, MY_MAX_PATH, fncomp);
 }
 
 int bigcomp(const void *p1, const void *p2) {
@@ -240,7 +243,7 @@ int bigcomp(const void *p1, const void *p2) {
 }
 void SortListByBiggest(int nCnt) {
 	wprintf(L"Sorting file list by largest image...\n");
-	qsort(szFiles, nCnt, 256, bigcomp);
+	qsort(szFiles, nCnt, MY_MAX_PATH, bigcomp);
 }
 
 int smallcomp(const void *p1, const void *p2) {
@@ -249,7 +252,7 @@ int smallcomp(const void *p1, const void *p2) {
 }
 void SortListBySmallest(int nCnt) {
 	wprintf(L"Sorting file list by smallest image...\n");
-	qsort(szFiles, nCnt, 256, smallcomp);
+	qsort(szFiles, nCnt, MY_MAX_PATH, smallcomp);
 }
 
 int bigxcomp(const void *p1, const void *p2) {
@@ -260,7 +263,7 @@ int bigxcomp(const void *p1, const void *p2) {
 }
 void SortListByBiggestX(int nCnt) {
 	wprintf(L"Sorting file list by widest image...\n");
-	qsort(szFiles, nCnt, 256, bigxcomp);
+	qsort(szFiles, nCnt, MY_MAX_PATH, bigxcomp);
 }
 
 int smallxcomp(const void *p1, const void *p2) {
@@ -269,7 +272,7 @@ int smallxcomp(const void *p1, const void *p2) {
 }
 void SortListBySmallestX(int nCnt) {
 	wprintf(L"Sorting file list by narrowest image...\n");
-	qsort(szFiles, nCnt, 256, smallxcomp);
+	qsort(szFiles, nCnt, MY_MAX_PATH, smallxcomp);
 }
 
 int bigycomp(const void *p1, const void *p2) {
@@ -280,7 +283,7 @@ int bigycomp(const void *p1, const void *p2) {
 }
 void SortListByBiggestY(int nCnt) {
 	wprintf(L"Sorting file list by tallest image...\n");
-	qsort(szFiles, nCnt, 256, bigycomp);
+	qsort(szFiles, nCnt, MY_MAX_PATH, bigycomp);
 }
 
 int smallycomp(const void *p1, const void *p2) {
@@ -289,7 +292,7 @@ int smallycomp(const void *p1, const void *p2) {
 }
 void SortListBySmallestY(int nCnt) {
 	wprintf(L"Sorting file list by shortest image...\n");
-	qsort(szFiles, nCnt, 256, smallycomp);
+	qsort(szFiles, nCnt, MY_MAX_PATH, smallycomp);
 }
 
 // Draws outlined text
@@ -617,7 +620,7 @@ int wmain(int argc, wchar_t *argv[])
 
 	// Set defaults
 	// Check if the program argument has a path. If so, we'll set that path instead
-	wchar_t path[_MAX_PATH];
+	wchar_t path[MY_MAX_PATH];
 	wchar_t drive[_MAX_DRIVE];
 	path[0]=L'\0';
 	drive[0]=L'\0';
@@ -627,7 +630,7 @@ int wmain(int argc, wchar_t *argv[])
 
 		wcscpy(szFolder, drive);
 		len=wcslen(szFolder);
-		wcsncpy(&szFolder[len], path, 256-len);
+		wcsncpy(&szFolder[len], path, MY_MAX_PATH-len);
 		szFolder[255]=L'\0';
 	} else {
 		wcscpy(szFolder, L".");
@@ -1092,7 +1095,7 @@ int wmain(int argc, wchar_t *argv[])
 		wprintf(L"returnfailed [errorlevel return is number of mosaic files failed or skipped]\n");
 		wprintf(L"server [process multiple files with sync events to external app]\n");
 		wprintf(L"monitors [size image to monitors and align with monitor offsets]\n");
-		wprintf(L"\n\nBy Mike Brent (Tursi). http://harmlesslion.com v119 - 25 January 2020\n");
+		wprintf(L"\n\nBy Mike Brent (Tursi). http://harmlesslion.com v120 - 14 February 2021\n");
 #ifdef _DEBUG
 			while (!_kbhit());
 #endif
@@ -1337,7 +1340,7 @@ void DoOneRun() {
 
 	// Loop for mosaic
 	do {
-		wchar_t szFileName[256];
+		wchar_t szFileName[MY_MAX_PATH];
 		int cntdown;
 
 		errCount=0;
@@ -1851,7 +1854,7 @@ recount:
 		// We do an outline by drawing 8 copies of the string around the desired point
 		// Just 1 pixel wide for now
 		if (AddFilename) {
-			wchar_t myStr[_MAX_PATH];
+			wchar_t myStr[MY_MAX_PATH];
 			int lastw=origw-currentw;
 			int lasth=origh-currenth;
 			int x=lastw/2+origx;
@@ -1882,7 +1885,12 @@ void BuildFileList(wchar_t *szFolder)
 {
 	HANDLE hIndex;
 	WIN32_FIND_DATA dat;
-	wchar_t buffer[256]; 
+	wchar_t buffer[MY_MAX_PATH]; 
+
+    if (lstrlen(szFolder) >= MY_MAX_PATH-3) {
+        printf("*** PATH TOO LONG, skipping %S\n", szFolder);
+        return;
+    }
 
 	wcscpy(buffer, szFolder);
 	wcscat(buffer, L"\\*");
@@ -1897,6 +1905,11 @@ void BuildFileList(wchar_t *szFolder)
 			return;
 		}
 		
+        if (lstrlen(szFolder) + lstrlen(dat.cFileName) >= MY_MAX_PATH-2) {
+            printf("*** File path too long, skipping %S\\%S\n", szFolder, dat.cFileName);
+            goto next;
+        }
+
 		wcscpy(buffer, szFolder);
 		wcscat(buffer, L"\\");
 		wcscat(buffer, dat.cFileName);
@@ -2344,9 +2357,9 @@ void shufflestring(wchar_t *qstring) {
 
 		// last check, make sure we aren't pointing at a bracket
 		if ((isdigit(qstring[p1])) && (isdigit(qstring[p2]))) {
-			wchar_t buf1[256], buf2[256];
-			memset(buf1, 0, 256);
-			memset(buf2, 0, 256);
+			wchar_t buf1[MY_MAX_PATH], buf2[MY_MAX_PATH];
+			memset(buf1, 0, MY_MAX_PATH);
+			memset(buf2, 0, MY_MAX_PATH);
 			buf1[0]=qstring[p1];
 			if (qstring[p1+1]=='[') {
 				// need to copy the substring too
@@ -2372,7 +2385,7 @@ void shufflestring(wchar_t *qstring) {
 				continue;
 			}
 			// now get the 3 pieces of the string
-			wchar_t ps1[256], ps2[256], ps3[256];
+			wchar_t ps1[MY_MAX_PATH], ps2[MY_MAX_PATH], ps3[MY_MAX_PATH];
 			wcscpy(ps1, qstring);
 			ps1[p1]=L'\0';
 			wcscpy(ps2, &qstring[p1+wcslen(buf1)]);
@@ -2528,11 +2541,11 @@ void ProcessMonitors() {
 }
 
 void ProcessHQuads() {
-	wchar_t qstring[256];
+	wchar_t qstring[MY_MAX_PATH];
 	int nTotal1, nTotal2;
 	int nthisx, nthisy;
 
-	wcsncpy(qstring, hquads, 256);
+	wcsncpy(qstring, hquads, MY_MAX_PATH);
 	qstring[255]='\0';
 	// find end of the string
 	nCurQuad=0;
@@ -2672,11 +2685,11 @@ void ProcessHQuads() {
 }
 
 void ProcessVQuads() {
-	wchar_t qstring[256];
+	wchar_t qstring[MY_MAX_PATH];
 	int nTotal1, nTotal2;
 	int nthisx, nthisy;
 
-	wcsncpy(qstring, vquads, 256);
+	wcsncpy(qstring, vquads, MY_MAX_PATH);
 	qstring[255]='\0';
 	// find end of the string
 	nCurQuad=0;
