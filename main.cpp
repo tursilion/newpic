@@ -1281,7 +1281,8 @@ int wmain(int argc, wchar_t *argv[])
 	// Set background
 	if (Background) {
 		wcscpy(szBuf,szOutfile);
-		SystemParametersInfo(SPI_SETDESKWALLPAPER,0,szBuf,SPIF_UPDATEINIFILE);
+		// as of Windows 11, the SPIF_SENDCHANGE parameteter is mandatory, previously it was implied (or at least not required for this)
+		SystemParametersInfo(SPI_SETDESKWALLPAPER,0,szBuf,SPIF_UPDATEINIFILE | SPIF_SENDCHANGE);
 	}
 
 	// Tell Active Desktop to refresh
